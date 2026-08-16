@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cardio-SVM | Cardiovascular Risk Screener</title>
+  <style>
+    :root {
+      --bg: #f4f5fb;
+      --card: #ffffff;
+      --ink: #1b1b2f;
+      --muted: #5b6275;
+      --line: #e2e4f0;
+      --indigo: #4c5fd5;
+      --indigo-dark: #3a0ca3;
+      --maroon: #6a040f;
+      --danger: #c1121f;
+      --success: #1b873f;
+      --shadow: 0 18px 40px rgba(34, 38, 84, 0.13);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 26px 18px 50px; }
+    .hero {
+      background: linear-gradient(135deg, var(--indigo-dark), var(--indigo));
+      color: #fff;
+      border-radius: 16px;
+      padding: 26px 28px;
+      box-shadow: var(--shadow);
+    }
+    .hero .who { font-size: 14px; opacity: .9; margin-bottom: 6px; }
+    .hero h1 { margin: 0 0 6px; font-size: 26px; letter-spacing: .2px; }
+    .hero p { margin: 0; opacity: .92; font-size: 14.5px; max-width: 70ch; }
+    .stats { display: flex; flex-wrap: wrap; gap: 14px; margin: 18px 0; }
+    .stat {
+      flex: 1 1 160px; background: var(--card); border: 1px solid var(--line);
+      border-radius: 12px; padding: 14px 16px; box-shadow: 0 6px 16px rgba(34,38,84,.05);
+    }
+    .stat .k { font-size: 12px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+    .stat .v { font-size: 22px; font-weight: 700; color: var(--indigo-dark); margin-top: 4px; }
+    .grid { display: grid; grid-template-columns: 1.45fr 1fr; gap: 18px; }
+    @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+      padding: 22px; box-shadow: var(--shadow);
+    }
+    .card h2 { margin: 0 0 4px; font-size: 18px; }
+    .card .sub { color: var(--muted); font-size: 13.5px; margin-bottom: 16px; }
+    .presets { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .presets button {
+      border: 1px solid var(--line); background: #fff; color: var(--ink);
+      padding: 7px 12px; border-radius: 999px; font-size: 13px; cursor: pointer;
+    }
+    .presets button:hover { border-color: var(--indigo); color: var(--indigo-dark); }
+    .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 13px 16px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field.full { grid-column: 1 / -1; }
+    label { font-size: 13px; color: var(--muted); font-weight: 600; }
+    input, select {
+      padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px;
+      font-size: 14px; background: #fff; color: var(--ink);
+    }
+    input:focus, select:focus { outline: 2px solid rgba(76,95,213,.35); border-color: var(--indigo); }
+    .submit {
+      margin-top: 18px; width: 100%; border: 0; border-radius: 11px; cursor: pointer;
+      padding: 13px; font-size: 15.5px; font-weight: 700; color: #fff;
+      background: linear-gradient(135deg, var(--indigo-dark), var(--indigo));
+    }
+    .submit:hover { filter: brightness(1.05); }
+    .result { border-radius: 14px; padding: 22px; margin-bottom: 16px; color: #fff; }
+    .result.high { background: linear-gradient(135deg, var(--maroon), var(--danger)); }
+    .result.low { background: linear-gradient(135deg, #14532d, var(--success)); }
+    .result .badge {
+      display: inline-block; background: rgba(255,255,255,.2); padding: 4px 12px;
+      border-radius: 999px; font-size: 13px; margin-bottom: 8px;
+    }
+    .result .big { font-size: 40px; font-weight: 800; line-height: 1; }
+    .result .note { opacity: .92; font-size: 13.5px; margin-top: 8px; }
+    .derived { margin-top: 6px; }
+    .derived h3 { font-size: 14px; margin: 0 0 8px; color: var(--muted); }
+    .derived table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .derived td { padding: 6px 8px; border-bottom: 1px solid var(--line); }
+    .derived td:last-child { text-align: right; font-weight: 600; }
+    .error { background: #fdecec; border: 1px solid #f5c2c2; color: #842029;
+             padding: 12px 14px; border-radius: 10px; margin-bottom: 16px; }
+    .foot { color: var(--muted); font-size: 12.5px; margin-top: 22px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="who">Abdallah Mohamed Mohamed · 231002006 · Machine Learning, final project</div>
+      <h1>Cardio-SVM — Cardiovascular Risk Screener</h1>
+      <p>Enter routine measurements and lifestyle answers. A calibrated RBF Support Vector Machine
+         estimates the probability of cardiovascular disease. BMI, pulse pressure, mean arterial
+         pressure and blood-pressure stage are computed for you.</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="k">Patients</div><div class="v">{{ "{:,}".format(rows) }}</div></div>
+      <div class="stat"><div class="k">Model</div><div class="v">{{ deployed_model }}</div></div>
+      <div class="stat"><div class="k">ROC-AUC</div><div class="v">{{ "%.3f"|format(metrics.roc_auc) }}</div></div>
+      <div class="stat"><div class="k">Threshold</div><div class="v">{{ threshold }}%</div></div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Patient inputs</h2>
+        <div class="sub">Five measurements and six lifestyle answers.</div>
+
+        <div class="presets">
+          <button type="button" onclick="preset('low')">Low-risk example</button>
+          <button type="button" onclick="preset('moderate')">Moderate example</button>
+          <button type="button" onclick="preset('high')">High-risk example</button>
+        </div>
+
+        <form method="POST" action="/predict">
+          <div class="fields">
+            <div class="field">
+              <label for="Age">Age (years)</label>
+              <input type="number" id="Age" name="Age" min="18" max="100" step="1"
+                     value="{{ form_data.Age if form_data else defaults.Age }}" required />
+            </div>
+            <div class="field">
+              <label for="Gender">Gender</label>
+              <select id="Gender" name="Gender">
+                {% set sel = form_data.Gender if form_data else categorical_defaults.Gender %}
+                {% for v in options.Gender %}<option value="{{ v }}" {% if v == sel %}selected{% endif %}>{{ v }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="field">
+              <label for="Height">Height (cm)</label>
+              <input type="number" id="Height" name="Height" min="120" max="220" step="1"
+                     value="{{ form_data.Height if form_data else defaults.Height }}" required />
+            </div>
+            <div class="field">
+              <label for="Weight">Weight (kg)</label>
+              <input type="number" id="Weight" name="Weight" min="30" max="200" step="0.5"
+                     value="{{ form_data.Weight if form_data else defaults.Weight }}" required />
+            </div>
+            <div class="field">
+              <label for="SystolicBP">Systolic BP (mmHg)</label>
+              <input type="number" id="SystolicBP" name="SystolicBP" min="80" max="220" step="1"
+                     value="{{ form_data.SystolicBP if form_data else defaults.SystolicBP }}" required />
+            </div>
+            <div class="field">
+              <label for="DiastolicBP">Diastolic BP (mmHg)</label>
+              <input type="number" id="DiastolicBP" name="DiastolicBP" min="50" max="150" step="1"
+                     value="{{ form_data.DiastolicBP if form_data else defaults.DiastolicBP }}" required />
+            </div>
+            <div class="field">
+              <label for="Cholesterol">Cholesterol</label>
+              <select id="Cholesterol" name="Cholesterol">
+                {% set sel = form_data.Cholesterol if form_data else categorical_defaults.Cholesterol %}
+                {% for v in options.Cholesterol %}<option value="{{ v }}" {% if v == sel %}selected{% endif %}>{{ v }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="field">
+              <label for="Glucose">Glucose</label>
+              <select id="Glucose" name="Glucose">
+                {% set sel = form_data.Glucose if form_data else categorical_defaults.Glucose %}
+                {% for v in options.Glucose %}<option value="{{ v }}" {% if v == sel %}selected{% endif %}>{{ v }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="field">
+              <label for="Smoker">Smoker</label>
+              <select id="Smoker" name="Smoker">
+                {% set sel = form_data.Smoker if form_data else categorical_defaults.Smoker %}
+                {% for v in options.Smoker %}<option value="{{ v }}" {% if v == sel %}selected{% endif %}>{{ v }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="field">
+              <label for="Alcohol">Alcohol intake</label>
+              <select id="Alcohol" name="Alcohol">
+                {% set sel = form_data.Alcohol if form_data else categorical_defaults.Alcohol %}
+                {% for v in options.Alcohol %}<option value="{{ v }}" {% if v == sel %}selected{% endif %}>{{ v }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="field full">
+              <label for="PhysicallyActive">Physically active</label>
+              <select id="PhysicallyActive" name="PhysicallyActive">
+                {% set sel = form_data.PhysicallyActive if form_data else categorical_defaults.PhysicallyActive %}
+                {% for v in options.PhysicallyActive %}<option value="{{ v }}" {% if v == sel %}selected{% endif %}>{{ v }}</option>{% endfor %}
+              </select>
+            </div>
+          </div>
+          <button class="submit" type="submit">Estimate cardiovascular risk</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Result</h2>
+        <div class="sub">Probability vs the tuned operating point ({{ threshold }}%).</div>
+
+        {% if error %}
+          <div class="error"><strong>Error:</strong> {{ error }}</div>
+        {% endif %}
+
+        {% if prediction %}
+          <div class="result {{ risk }}">
+            <span class="badge">{{ prediction }}</span>
+            <div class="big">{{ probability }}%</div>
+            <div class="note">Estimated probability of cardiovascular disease.</div>
+          </div>
+          {% if derived %}
+          <div class="derived">
+            <h3>Computed features</h3>
+            <table>
+              <tr><td>BMI</td><td>{{ derived.BMI }}</td></tr>
+              <tr><td>BMI category</td><td>{{ derived.BMICategory }}</td></tr>
+              <tr><td>Pulse pressure</td><td>{{ derived.PulsePressure }} mmHg</td></tr>
+              <tr><td>Mean arterial pressure</td><td>{{ derived.MeanArterialPressure }} mmHg</td></tr>
+              <tr><td>Blood-pressure stage</td><td>{{ derived.BPCategory }}</td></tr>
+              <tr><td>Age band</td><td>{{ derived.AgeGroup }}</td></tr>
+            </table>
+          </div>
+          {% endif %}
+        {% else %}
+          <p style="color: var(--muted); font-size: 14px;">
+            Fill the form and submit, or load one of the example patients to see a prediction.
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PRESETS = {
+      low:      { Age: 35, Gender: "Female", Height: 170, Weight: 62, SystolicBP: 110, DiastolicBP: 70,
+                  Cholesterol: "Normal", Glucose: "Normal", Smoker: "No", Alcohol: "No", PhysicallyActive: "Yes" },
+      moderate: { Age: 52, Gender: "Male", Height: 174, Weight: 88, SystolicBP: 135, DiastolicBP: 86,
+                  Cholesterol: "Above normal", Glucose: "Normal", Smoker: "No", Alcohol: "Yes", PhysicallyActive: "Yes" },
+      high:     { Age: 60, Gender: "Female", Height: 162, Weight: 95, SystolicBP: 170, DiastolicBP: 104,
+                  Cholesterol: "Well above normal", Glucose: "Above normal", Smoker: "Yes", Alcohol: "Yes", PhysicallyActive: "No" },
+    };
+    function preset(kind) {
+      const p = PRESETS[kind];
+      for (const [k, v] of Object.entries(p)) {
+        const el = document.getElementById(k);
+        if (el) el.value = v;
+      }
+    }
+  </script>
+</body>
+</html>
