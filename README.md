@@ -1,10 +1,9 @@
-# Cardio-SVM — Cardiovascular Risk Screener
+# Cardio-SVM — Cardiovascular Risk 
 
-**Author:** Abdallah Mohamed Mohamed
-**Student ID:** 231002006
-**Course:** Machine Learning, final project
+**NAME:** Malak Reda Abdelghani
+**ID:** 231001933
 
-record:https://canva.link/tovbsw0jbp1nda8
+record:
 
 A supervised binary-classification pipeline that estimates the probability of cardiovascular disease (CVD) from routine vitals and lifestyle answers. The deployed screener is an **RBF Support Vector Machine**, benchmarked against K-Nearest Neighbours and XGBoost. The repository ships the cleaned modelling dataset, an end-to-end notebook, eleven figures, a **single** serialized bundle (pipeline + threshold + UI metadata in one `.pkl`), and a Flask web app for interactive predictions.
 
