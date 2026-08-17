@@ -3,7 +3,7 @@
 **NAME:** Malak Reda Abdelghani
 **ID:** 231001933
 
-record:
+record: https://drive.google.com/drive/folders/1n-MPoQoEG9-anzaocpG11W-C9QoI3wO-
 
 A supervised binary-classification pipeline that estimates the probability of cardiovascular disease (CVD) from routine vitals and lifestyle answers. The deployed screener is an **RBF Support Vector Machine**, benchmarked against K-Nearest Neighbours and XGBoost. The repository ships the cleaned modelling dataset, an end-to-end notebook, eleven figures, a **single** serialized bundle (pipeline + threshold + UI metadata in one `.pkl`), and a Flask web app for interactive predictions.
 
